@@ -3,7 +3,7 @@ services:
   name: flask-app
   env: python
   buildCommand: pip install -r requirements.txt
-  startCommand: gunicorn -b :10000 app.py
+  startCommand: gunicorn -b :$PORT app:app
   envVars:
   - key: PORT
     value: 10000
