@@ -1,4 +1,4 @@
---upgrade pip
+pip>=21.3
 gunicorn
 flask
 biopython
