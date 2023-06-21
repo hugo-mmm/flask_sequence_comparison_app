@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: flask-app
+    name: app
     env: python3.10
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn -b :10000 app:app
