@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sequence Comparison App</title>
+    <style>
+        /* Add your custom CSS styles here */
+    </style>
+    <script>
+        // Add your JavaScript code here for handling form submissions and interacting with the Flask app's endpoints
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('sequence-form');
+            form.addEventListener('submit', (event) => {
+                event.preventDefault();
+                calculate();
+            });
+        });
+
+        async function calculate() {
+            const seq1_name = document.getElementById('seq1_name').value;
+            const seq1 = document.getElementById('seq1').value;
+            const seq2_name = document.getElementById('seq2_name').value;
+            const seq2 = document.getElementById('seq2').value;
+            const calculation = document.getElementById('calculation').value;
+
+            const response = await fetch('/' + calculation, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ seq1_name: seq1_name, seq1: seq1, seq2_name: seq2_name, seq2: seq2 })
+            });
+
+            const result = await response.json();
+
+            // Display the result
+            const resultElement = document.getElementById('result');
+            if (calculation === 'seq_identity') {
+                resultElement.innerText = 'Identity: ' + result['identity percentage'] + '%';
+            } else if (calculation === 'seq_similarity') {
+                resultElement.innerText = 'Similarity Score: ' + result['similarity score'];
+            } else if (calculation === 'seq_modifications') {
+                resultElement.innerText = 'Modifications: ' + result.modifications;
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Sequence Comparison App</h1>
+
+    <form id="sequence-form">
+        <label for="seq1_name">Sequence 1 Name:</label>
+        <input type="text" name="seq1_name" id="seq1_name">
+
+        <label for="seq1">Sequence 1:</label>
+        <textarea name="seq1" id="seq1" rows="4"></textarea>
+
+        <label for="seq2_name">Sequence 2 Name:</label>
+        <input type="text" name="seq2_name" id="seq2_name">
+
+        <label for="seq2">Sequence 2:</label>
+        <textarea name="seq2" id="seq2" rows="4"></textarea>
+
+        <label for="calculation">Choose Calculation:</label>
+        <select name="calculation" id="calculation">
+            <option value="seq_identity">Identity</option>
+            <option value="seq_similarity">Similarity</option>
+            <option value="seq_modifications">Modifications</option>
+        </select>
+
+        <button type="submit">Calculate</button>
+    </form>
+
+    <div id="result"></div>
+</body>
+</html>
