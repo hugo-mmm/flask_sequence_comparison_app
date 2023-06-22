@@ -116,9 +116,12 @@ def seq_similarity():
             pivot_seq1 += 4
             pivot_seq2 += 4
         
-        similarity = sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq1, aligned_seq2)) / len(aligned_seq1) * 100
-        similarity = round(similarity, 2)
-        
+        if len(aligned_seq1) > 0:
+            similarity = sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq1, aligned_seq2)) / len(aligned_seq1) * 100
+            similarity = round(similarity, 2)
+        else:
+            similarity = 0
+
         response = {
             'similarity score': similarity
         }
@@ -126,6 +129,7 @@ def seq_similarity():
         return jsonify(response), 200
     except KeyError as e:
         return jsonify({'error': 'Invalid request data. Missing key: {}'.format(e)}), 400
+
 
 
 @app.route('/seq_modifications', methods=['POST'])
