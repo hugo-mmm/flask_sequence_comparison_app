@@ -139,7 +139,7 @@ def seq_modifications():
                 substitutions.append(f"{a}{i}{b}")
         
         response = {
-            'modifications': ' '.join(substitutions)
+            'modifications': ' '.join(substitutions) if substitutions else 'NONE'  # Check if substitutions list is empty
         }
         
         return jsonify(response), 200
