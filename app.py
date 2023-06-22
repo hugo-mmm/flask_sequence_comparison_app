@@ -83,49 +83,53 @@ def seq_similarity():
         seq1_name, seq1 = parse_sequence_data(seq1_name_data)
         seq2_name, seq2 = parse_sequence_data(seq2_name_data)
         
-        blosum62 = substitution_matrices.load("BLOSUM62")
+        # Check for non-nucleotide characters in sequences
+        if any(letter.lower() not in seq1.lower() for letter in seq1):
+            return jsonify({'error': f"Inserted Sequence for {seq1_name} is not a nucleotide sequence"}), 400
+        if any(letter.lower() not in seq2.lower() for letter in seq2):
+            return jsonify({'error': f"Inserted Sequence for {seq2_name} is not a nucleotide sequence"}), 400
         
-        aligner = PairwiseAligner()
-        aligner.substitution_matrix = blosum62
-        aligner.open_gap_score = -5
-        aligner.extend_gap_score = -1
-        
-        alignments = aligner.align(seq1, seq2)
-        best_alignment = alignments[0]
-        split_seq = str(best_alignment).split("\n")
-        
-        aligned_seq1 = ""
-        aligned_seq2 = ""
-        pivot_seq1 = 0
-        pivot_seq2 = 2
-        
-        num_rows = int(len(split_seq) / 4)
-        
-        for i in range(num_rows):
-            seq1_to_add = split_seq[pivot_seq1]
-            seq2_to_add = split_seq[pivot_seq2]
-        
-            max_index = len(seq1_to_add) - 4 if i == num_rows - 1 else len(seq1_to_add)
+        try:
+            alignments = aligner.align(seq1, seq2)
+            best_alignment = alignments[0]
+            split_seq = str(best_alignment).split("\n")
             
-            aligned_seq1 += seq1_to_add[20:max_index]
-            aligned_seq2 += seq2_to_add[20:max_index]
+            aligned_seq1 = ""
+            aligned_seq2 = ""
+            pivot_seq1 = 0
+            pivot_seq2 = 2
             
-            pivot_seq1 += 4
-            pivot_seq2 += 4
-        
-        if len(aligned_seq1) == 0:
-            return jsonify({'similarity score': 'N/A'}), 200
+            num_rows = int(len(split_seq) / 4)
+            
+            for i in range(num_rows):
+                seq1_to_add = split_seq[pivot_seq1]
+                seq2_to_add = split_seq[pivot_seq2]
+            
+                max_index = len(seq1_to_add) - 4 if i == num_rows - 1 else len(seq1_to_add)
+                
+                aligned_seq1 += seq1_to_add[20:max_index]
+                aligned_seq2 += seq2_to_add[20:max_index]
+                
+                pivot_seq1 += 4
+                pivot_seq2 += 4
+            
+            if len(aligned_seq1) > 0:
+                similarity = sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq1, aligned_seq2)) / len(aligned_seq1) * 100
+                similarity = round(similarity, 2)
+            else:
+                similarity = 0
 
-        similarity = sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq1, aligned_seq2)) / len(aligned_seq1) * 100
-        similarity = round(similarity, 2)
-        
-        response = {
-            'similarity score': similarity
-        }
-        
-        return jsonify(response), 200
+            response = {
+                'similarity score': similarity
+            }
+            
+            return jsonify(response), 200
+        except ValueError as e:
+            raise  # Re-raise the error if it's not the expected ValueError
     except KeyError as e:
-        return jsonify({'similarity score': 'N/A', 'error': 'Invalid request data. Missing key: {}'.format(e)}), 400
+        return jsonify({'error': 'Invalid request data. Missing key: {}'.format(e)}), 400
+
+
 
 @app.route('/seq_modifications', methods=['POST'])
 def seq_modifications():
@@ -160,25 +164,27 @@ def seq_alignment():
         seq1_name, seq1 = parse_sequence_data(seq1_name_data)
         seq2_name, seq2 = parse_sequence_data(seq2_name_data)
         
-        blosum62 = substitution_matrices.load("BLOSUM62")
+        # Check for non-nucleotide characters in sequences
+        if any(letter.lower() not in seq1.lower() for letter in seq1):
+            return jsonify({'error': f"Inserted Sequence for {seq1_name} is not a nucleotide sequence"}), 400
+        if any(letter.lower() not in seq2.lower() for letter in seq2):
+            return jsonify({'error': f"Inserted Sequence for {seq2_name} is not a nucleotide sequence"}), 400
         
-        aligner = PairwiseAligner()
-        aligner.substitution_matrix = blosum62
-        aligner.open_gap_score = -5
-        aligner.extend_gap_score = -1
-        
-        alignments = aligner.align(seq1, seq2)
-        best_alignment = alignments[0]
-        
-        alignment_str = str(best_alignment)
-        
-        response = {
-            'alignment': alignment_str
-        }
-        
-        return jsonify(response), 200
+        try:
+            alignments = aligner.align(seq1, seq2)
+            best_alignment = alignments[0]
+            
+            alignment_str = str(best_alignment)
+            
+            response = {
+                'alignment': alignment_str
+            }
+            
+            return jsonify(response), 200
+        except ValueError as e:
+            raise  # Re-raise the error if it's not the expected ValueError
     except KeyError as e:
-        return jsonify({'alignment': 'N/A', 'error': 'Invalid request data. Missing key: {}'.format(e)}), 400
+        return jsonify({'error': 'Invalid request data. Missing key: {}'.format(e)}), 400
     
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.getenv('PORT', 80)))
