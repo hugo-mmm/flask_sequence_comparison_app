@@ -59,6 +59,9 @@ def seq_identity():
             pivot_seq1 += 4
             pivot_seq2 += 4
         
+        if len(aligned_seq1) == 0:
+            return jsonify({'error in comparing Identity': 'Unable to align the sequences'}), 400
+
         identity = sum(a == b for a, b in zip(aligned_seq1, aligned_seq2)) / len(aligned_seq1) * 100
         identity = round(identity, 2)
         
@@ -69,6 +72,7 @@ def seq_identity():
         return jsonify(response), 200
     except KeyError as e:
         return jsonify({'error': 'Invalid request data. Missing key: {}'.format(e)}), 400
+
 
 
 @app.route('/seq_similarity', methods=['POST'])
