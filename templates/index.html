@@ -41,7 +41,7 @@
             } else if (calculation === 'seq_modifications') {
                 resultElement.innerText = 'Modifications: ' + result.modifications;
             } else if (calculation === 'seq_alignment') {
-                resultElement.innerText = 'Alignment:\n' + result.alignment;
+                resultElement.innerHTML = '<pre>Alignment:\n' + result.alignment + '</pre>';
             }
         }
     </script>
