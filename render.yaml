@@ -3,7 +3,7 @@ services:
     name: Flask-app
     env: Docker
     buildCommand: docker build -t flask-app .
-    startCommand: docker run -p 10000:5000 flask-app
+    startCommand: docker run -p 10000:80 flask-app
     envVars:
       - key: PORT
         value: 10000
