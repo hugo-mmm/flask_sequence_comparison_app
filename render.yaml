@@ -1,9 +1,9 @@
 services:
   - type: web
     name: Flask-app
-    env: python-3.10
-    buildCommand: python3.10.5 -m pip install -r requirements.txt
-    startCommand: gunicorn -b :10000 app:app
+    env: Docker
+    buildCommand: docker build -t flask-app .
+    startCommand: docker run -p 10000:5000 flask-app
     envVars:
       - key: PORT
         value: 10000
