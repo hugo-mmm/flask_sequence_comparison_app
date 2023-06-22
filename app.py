@@ -7,6 +7,12 @@ import os
 
 app = Flask(__name__)
 
+# Create the aligner object in a global scope
+aligner = PairwiseAligner()
+aligner.substitution_matrix = substitution_matrices.load("BLOSUM62")
+aligner.open_gap_score = -5
+aligner.extend_gap_score = -1
+
 def parse_sequence_data(data):
     lines = data.strip().split('\n')
     name_line = next(line for line in lines if line.startswith(">"))
@@ -114,7 +120,7 @@ def seq_similarity():
                 pivot_seq2 += 4
             
             if len(aligned_seq1) > 0:
-                similarity = sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq1, aligned_seq2)) / len(aligned_seq1) * 100
+                similarity = sum(aligner.substitution_matrix.get((a, b), -4) for a, b in zip(aligned_seq1, aligned_seq2)) / len(aligned_seq1) * 100
                 similarity = round(similarity, 2)
             else:
                 similarity = 0
