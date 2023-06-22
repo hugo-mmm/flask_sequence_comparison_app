@@ -3,6 +3,67 @@
 <head>
     <title>Sequence Comparison App</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+        header {
+            background: #50a3a2;
+            color: white;
+            padding-top: 30px;
+            min-height: 70px;
+            border-bottom: #e8491d 3px solid;
+        }
+        header a {
+            color: #ffffff;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-size: 16px;
+        }
+        header li {
+            float: left;
+            display: inline;
+            padding: 0 20px 0 20px;
+        }
+        header #branding {
+            float: left;
+        }
+        header #branding h1 {
+            margin: 0;
+        }
+        header nav {
+            float: right;
+            margin-top: 10px;
+        }
+        header .highlight, header .current a {
+            color: #e8491d;
+            font-weight: bold;
+        }
+        header a:hover {
+            color: #cccccc;
+            font-weight: bold;
+        }
+        #showcase {
+            min-height: 400px;
+            background: url('img/showcase.jpg') no-repeat 0 -400px;
+            text-align: center;
+            color: #ffffff;
+        }
+        #showcase h1 {
+            margin-top: 100px;
+            font-size: 55px;
+            margin-bottom: 10px;
+        }
+        #showcase p {
+            font-size: 20px;
+        }
         /* Add your custom CSS styles here */
     </style>
     <script>
@@ -14,7 +75,6 @@
                 calculate();
             });
         });
-
         async function calculate() {
             const seq1_name = document.getElementById('seq1_name').value;
             const seq1 = document.getElementById('seq1').value;
@@ -47,32 +107,37 @@
     </script>
 </head>
 <body>
-    <h1>Sequence Comparison App</h1>
+    <header>
+        <img src="SilicoLifeLogo_Green.png" alt="Logo" style="width:200px;height:100px;">
+        <h1>Sequence Comparison App</h1>
+    </header>
 
-    <form id="sequence-form">
-        <label for="seq1_name">Sequence 1 Name:</label>
-        <input type="text" name="seq1_name" id="seq1_name">
+    <div class="container">
+        <form id="sequence-form">
+            <label for="seq1_name">Sequence 1 Name:</label>
+            <input type="text" name="seq1_name" id="seq1_name">
 
-        <label for="seq1">Sequence 1:</label>
-        <textarea name="seq1" id="seq1" rows="4"></textarea>
+            <label for="seq1">Sequence 1:</label>
+            <textarea name="seq1" id="seq1" rows="4"></textarea>
 
-        <label for="seq2_name">Sequence 2 Name:</label>
-        <input type="text" name="seq2_name" id="seq2_name">
+            <label for="seq2_name">Sequence 2 Name:</label>
+            <input type="text" name="seq2_name" id="seq2_name">
 
-        <label for="seq2">Sequence 2:</label>
-        <textarea name="seq2" id="seq2" rows="4"></textarea>
+            <label for="seq2">Sequence 2:</label>
+            <textarea name="seq2" id="seq2" rows="4"></textarea>
 
-        <label for="calculation">Choose Calculation:</label>
-        <select name="calculation" id="calculation">
-            <option value="seq_identity">Identity</option>
-            <option value="seq_similarity">Similarity</option>
-            <option value="seq_modifications">Modifications</option>
-            <option value="seq_alignment">Alignment</option>  <!-- Added the 'seq_alignment' option -->
-        </select>
+            <label for="calculation">Choose Calculation:</label>
+            <select name="calculation" id="calculation">
+                <option value="seq_identity">Identity</option>
+                <option value="seq_similarity">Similarity</option>
+                <option value="seq_modifications">Modifications</option>
+                <option value="seq_alignment">Alignment</option>  <!-- Added the 'seq_alignment' option -->
+            </select>
 
-        <button type="submit">Calculate</button>
-    </form>
+            <button type="submit">Calculate</button>
+        </form>
 
-    <div id="result"></div>
+        <div id="result"></div>
+    </div>
 </body>
 </html>
