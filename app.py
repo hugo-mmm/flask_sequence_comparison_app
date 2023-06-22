@@ -63,7 +63,7 @@ def seq_identity():
         identity = round(identity, 2)
         
         response = {
-            'identity percentage': identity
+            'identity percentage': '{:.2f}%'.format(identity)  # Add the percentage symbol
         }
         
         return jsonify(response), 200
