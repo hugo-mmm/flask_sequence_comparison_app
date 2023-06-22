@@ -40,6 +40,8 @@
                 resultElement.innerText = 'Similarity Score: ' + result['similarity score'];
             } else if (calculation === 'seq_modifications') {
                 resultElement.innerText = 'Modifications: ' + result.modifications;
+            } else if (calculation === 'seq_alignment') {
+                resultElement.innerText = 'Alignment:\n' + result.alignment;
             }
         }
     </script>
@@ -65,6 +67,7 @@
             <option value="seq_identity">Identity</option>
             <option value="seq_similarity">Similarity</option>
             <option value="seq_modifications">Modifications</option>
+            <option value="seq_alignment">Alignment</option>  <!-- Added the 'seq_alignment' option -->
         </select>
 
         <button type="submit">Calculate</button>
