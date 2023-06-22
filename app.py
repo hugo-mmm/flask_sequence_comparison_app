@@ -20,16 +20,16 @@ def index():
     return render_template('index.html')
 
 @app.route('/seq_identity', methods=['POST'])
+@app.route('/seq_identity', methods=['POST'])
 def seq_identity():
     data = request.get_json()
-    seq1_name_data = ">" + data['seq1_name'] + "\n" + data['seq1']
-    seq2_name_data = ">" + data['seq2_name'] + "\n" + data['seq2']
-    
-    seq1_name, seq1 = parse_sequence_data(seq1_name_data)
-    seq2_name, seq2 = parse_sequence_data(seq2_name_data)
-    
-    blosum62 = substitution_matrices.load("BLOSUM62")
-    
+    try:
+        seq1_name_data = ">" + data['seq1_name'] + "\n" + data['seq1']
+        seq2_name_data = ">" + data['seq2_name'] + "\n" + data['seq2']
+        
+        seq1_name, seq1 = parse_sequence_data(seq1_name_data)
+        seq2_name, seq2 = parse_sequence_data(seq2_name_data)
+
     aligner = PairwiseAligner()
     aligner.substitution_matrix = blosum62
     aligner.open_gap_score = -5
@@ -62,18 +62,24 @@ def seq_identity():
     identity = round(identity, 2)
     
     response = {
-        'identity percentage': identity
-    }
-    
-    return jsonify(response), 200
+            'identity percentage': identity
+        }
+        
+        return jsonify(response), 200
+    except KeyError as e:
+        return jsonify({'error': 'Invalid request data. Missing key: {}'.format(e)}), 400
+
+
 
 @app.route('/seq_similarity', methods=['POST'])
 def seq_similarity():
     data = request.get_json()
-    seq1_name_data = ">" + data['seq1_name'] + "\n" + data['seq1']
-    seq2_name_data = ">" + data['seq2_name'] + "\n" + data['seq2']
-    seq1_name, seq1 = parse_sequence_data(seq1_name_data)
-    seq2_name, seq2 = parse_sequence_data(seq2_name_data)
+    try:
+        seq1_name_data = ">" + data['seq1_name'] + "\n" + data['seq1']
+        seq2_name_data = ">" + data['seq2_name'] + "\n" + data['seq2']
+        
+        seq1_name, seq1 = parse_sequence_data(seq1_name_data)
+        seq2_name, seq2 = parse_sequence_data(seq2_name_data)
     
     blosum62 = substitution_matrices.load("BLOSUM62")
     
@@ -109,19 +115,23 @@ def seq_similarity():
     similarity = round(similarity, 2)
     
     response = {
-        'similarity score': similarity
-    }
-    
-    return jsonify(response), 200
+            'similarity score': similarity
+        }
+        
+        return jsonify(response), 200
+    except KeyError as e:
+        return jsonify({'error': 'Invalid request data. Missing key: {}'.format(e)}), 400
 
 
 @app.route('/seq_modifications', methods=['POST'])
 def seq_modifications():
     data = request.get_json()
-    seq1_name_data = ">" + data['seq1_name'] + "\n" + data['seq1']
-    seq2_name_data = ">" + data['seq2_name'] + "\n" + data['seq2']
-    seq1_name, seq1 = parse_sequence_data(seq1_name_data)
-    seq2_name, seq2 = parse_sequence_data(seq2_name_data)
+    try:
+        seq1_name_data = ">" + data['seq1_name'] + "\n" + data['seq1']
+        seq2_name_data = ">" + data['seq2_name'] + "\n" + data['seq2']
+        
+        seq1_name, seq1 = parse_sequence_data(seq1_name_data)
+        seq2_name, seq2 = parse_sequence_data(seq2_name_data)
     
     substitutions = []
     for i, (a, b) in enumerate(zip(seq1, seq2), start=1):
@@ -129,10 +139,12 @@ def seq_modifications():
             substitutions.append(f"{a}{i}{b}")
     
     response = {
-        'modifications': ' '.join(substitutions)
-    }
-    
-    return jsonify(response), 200
+            'modifications': ' '.join(substitutions)
+        }
+        
+        return jsonify(response), 200
+    except KeyError as e:
+        return jsonify({'error': 'Invalid request data. Missing key: {}'.format(e)}), 400
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.getenv('PORT', 80)))
