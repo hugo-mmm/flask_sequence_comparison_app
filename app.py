@@ -60,7 +60,7 @@ def seq_identity():
             pivot_seq2 += 4
         
         if len(aligned_seq1) == 0:
-            return jsonify({'error': 'Unable to align the sequences'}), 400
+            return jsonify({'identity percentage': 'N/A'}), 200
 
         identity = sum(a == b for a, b in zip(aligned_seq1, aligned_seq2)) / len(aligned_seq1) * 100
         identity = round(identity, 2)
@@ -71,10 +71,7 @@ def seq_identity():
         
         return jsonify(response), 200
     except KeyError as e:
-        return jsonify({'error': 'Invalid request data. Missing key: {}'.format(e)}), 400
-
-
-
+        return jsonify({'identity percentage': 'N/A', 'error': 'Invalid request data. Missing key: {}'.format(e)}), 400
 
 @app.route('/seq_similarity', methods=['POST'])
 def seq_similarity():
@@ -116,21 +113,19 @@ def seq_similarity():
             pivot_seq1 += 4
             pivot_seq2 += 4
         
-        if len(aligned_seq1) > 0:
-            similarity = sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq1, aligned_seq2)) / len(aligned_seq1) * 100
-            similarity = round(similarity, 2)
-        else:
-            similarity = 0
+        if len(aligned_seq1) == 0:
+            return jsonify({'similarity score': 'N/A'}), 200
 
+        similarity = sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq1, aligned_seq2)) / len(aligned_seq1) * 100
+        similarity = round(similarity, 2)
+        
         response = {
             'similarity score': similarity
         }
         
         return jsonify(response), 200
     except KeyError as e:
-        return jsonify({'error': 'Invalid request data. Missing key: {}'.format(e)}), 400
-
-
+        return jsonify({'similarity score': 'N/A', 'error': 'Invalid request data. Missing key: {}'.format(e)}), 400
 
 @app.route('/seq_modifications', methods=['POST'])
 def seq_modifications():
@@ -153,8 +148,7 @@ def seq_modifications():
         
         return jsonify(response), 200
     except KeyError as e:
-        return jsonify({'error': 'Invalid request data. Missing key: {}'.format(e)}), 400
-    
+        return jsonify({'modifications': 'N/A', 'error': 'Invalid request data. Missing key: {}'.format(e)}), 400
 
 @app.route('/seq_alignment', methods=['POST'])
 def seq_alignment():
@@ -184,9 +178,7 @@ def seq_alignment():
         
         return jsonify(response), 200
     except KeyError as e:
-        return jsonify({'error': 'Invalid request data. Missing key: {}'.format(e)}), 400
-    
-    
+        return jsonify({'alignment': 'N/A', 'error': 'Invalid request data. Missing key: {}'.format(e)}), 400
     
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.getenv('PORT', 80)))
