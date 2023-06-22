@@ -29,8 +29,6 @@ def seq_identity():
         seq1_name, seq1 = parse_sequence_data(seq1_name_data)
         seq2_name, seq2 = parse_sequence_data(seq2_name_data)
         
-        blosum62 = substitution_matrices.load("BLOSUM62")
-        
         aligner = PairwiseAligner()
         aligner.substitution_matrix = blosum62
         aligner.open_gap_score = -5
@@ -147,5 +145,37 @@ def seq_modifications():
         return jsonify({'error': 'Invalid request data. Missing key: {}'.format(e)}), 400
     
 
+@app.route('/seq_alignment', methods=['POST'])
+def seq_alignment():
+    data = request.get_json()
+    try:
+        seq1_name_data = ">" + data['seq1_name'] + "\n" + data['seq1']
+        seq2_name_data = ">" + data['seq2_name'] + "\n" + data['seq2']
+        
+        seq1_name, seq1 = parse_sequence_data(seq1_name_data)
+        seq2_name, seq2 = parse_sequence_data(seq2_name_data)
+        
+        blosum62 = substitution_matrices.load("BLOSUM62")
+        
+        aligner = PairwiseAligner()
+        aligner.substitution_matrix = blosum62
+        aligner.open_gap_score = -5
+        aligner.extend_gap_score = -1
+        
+        alignments = aligner.align(seq1, seq2)
+        best_alignment = alignments[0]
+        
+        alignment_str = str(best_alignment)
+        
+        response = {
+            'alignment': alignment_str
+        }
+        
+        return jsonify(response), 200
+    except KeyError as e:
+        return jsonify({'error': 'Invalid request data. Missing key: {}'.format(e)}), 400
+    
+    
+    
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.getenv('PORT', 80)))
