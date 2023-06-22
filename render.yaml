@@ -2,7 +2,7 @@ services:
   - type: web
     name: Flask-app
     env: python-3.10
-    buildCommand: python3.10 -m pip install -r requirements.txt
+    buildCommand: python3.10.5 -m pip install -r requirements.txt
     startCommand: gunicorn -b :10000 app:app
     envVars:
       - key: PORT

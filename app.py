@@ -3,6 +3,7 @@ from Bio.Align import PairwiseAligner
 from Bio.Align import substitution_matrices
 from flask import Flask, render_template
 import sys
+import os
 
 app = Flask(__name__)
 
@@ -134,4 +135,4 @@ def seq_modifications():
     return jsonify(response), 200
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5000)))
