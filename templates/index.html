@@ -2,30 +2,13 @@
 <html>
 <head>
     <title>Sequence Comparison App</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
     <style>
         body {
             background-color: #f4f4f4;
         }
-        .container {
-            max-width: 600px;
-            margin: auto;
-            padding: 20px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-control, button {
-            height: 40px;
-        }
-        #result {
-            margin-top: 20px;
-            white-space: pre-line;
-        }
-    </style>
     </style>
     <script>
-        // Add your JavaScript code here for handling form submissions and interacting with the Flask app's endpoints
         document.addEventListener('DOMContentLoaded', () => {
             const form = document.getElementById('sequence-form');
             form.addEventListener('submit', (event) => {
@@ -33,81 +16,80 @@
                 calculate();
             });
         });
+
         async function calculate() {
             const seq1_name = document.getElementById('seq1_name').value;
             const seq1 = document.getElementById('seq1').value;
             const seq2_name = document.getElementById('seq2_name').value;
             const seq2 = document.getElementById('seq2').value;
-            const calculation = document.getElementById('calculation').value;
 
-            const response = await fetch('/' + calculation, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ seq1_name: seq1_name, seq1: seq1, seq2_name: seq2_name, seq2: seq2 })
-            });
+            const calculations = ['seq_identity', 'seq_similarity', 'seq_modifications', 'seq_alignment'];
+            for (let calculation of calculations) {
+                const response = await fetch('/' + calculation, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ seq1_name: seq1_name, seq1: seq1, seq2_name: seq2_name, seq2: seq2 })
+                });
 
-            const result = await response.json();
+                const result = await response.json();
 
-            // Display the result
-            const resultElement = document.getElementById('result');
-            if (calculation === 'seq_identity') {
-                resultElement.innerText = 'Identity: ' + result['identity percentage'] + '%';
-            } else if (calculation === 'seq_similarity') {
-                resultElement.innerText = 'Similarity Score: ' + result['similarity score'];
-            } else if (calculation === 'seq_modifications') {
-                resultElement.innerText = 'Modifications: ' + result.modifications;
-            } else if (calculation === 'seq_alignment') {
-                resultElement.innerHTML = '<pre>Alignment:\n' + result.alignment + '</pre>';
+                // Display the result
+                const resultElement = document.getElementById(calculation);
+                if (calculation === 'seq_identity') {
+                    resultElement.innerText = 'Identity: ' + result['identity percentage'] + '%';
+                } else if (calculation === 'seq_similarity') {
+                    resultElement.innerText = 'Similarity Score: ' + result['similarity score'];
+                } else if (calculation === 'seq_modifications') {
+                    resultElement.innerText = 'Modifications: ' + result.modifications;
+                } else if (calculation === 'seq_alignment') {
+                    resultElement.innerHTML = '<pre>Alignment:\n' + result.alignment + '</pre>';
+                }
             }
         }
     </script>
 </head>
 <body>
-    <div class="container">
+    <div class="container mx-auto px-4">
         <img src="{{ url_for('static', filename='SilicoLifeLogo_Green.png') }}" alt="Logo" class="img-fluid mb-3">
         <h1 class="mb-3">Sequence Comparison App</h1>
 
-        <form id="sequence-form">
-            <div class="form-group">
-                <label for="seq1_name">Sequence 1 Name:</label>
-                <input type="text" name="seq1_name" id="seq1_name" class="form-control">
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <form id="sequence-form">
+                    <div class="form-group">
+                        <label for="seq1_name">Sequence 1 Name:</label>
+                        <input type="text" name="seq1_name" id="seq1_name" class="form-control" value="Sequence 1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="seq1">Sequence 1:</label>
+                        <textarea name="seq1" id="seq1" rows="4" class="form-control"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="seq2_name">Sequence 2 Name:</label>
+                        <input type="text" name="seq2_name" id="seq2_name" class="form-control" value="Sequence 2">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="seq2">Sequence 2:</label>
+                        <textarea name="seq2" id="seq2" rows="4" class="form-control"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Calculate</button>
+                </form>
             </div>
-
-            <div class="form-group">
-                <label for="seq1">Sequence 1:</label>
-                <textarea name="seq1" id="seq1" rows="4" class="form-control"></textarea>
+            <div>
+                <div id="seq_identity" class="mt-3"></div>
+                <div id="seq_similarity" class="mt-3"></div>
+                <div id="seq_modifications" class="mt-3"></div>
+                <div id="seq_alignment" class="mt-3"></div>
             </div>
-
-            <div class="form-group">
-                <label for="seq2_name">Sequence 2 Name:</label>
-                <input type="text" name="seq2_name" id="seq2_name" class="form-control">
-            </div>
-
-            <div class="form-group">
-                <label for="seq2">Sequence 2:</label>
-                <textarea name="seq2" id="seq2" rows="4" class="form-control"></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="calculation">Choose Calculation:</label>
-                <select name="calculation" id="calculation" class="form-control">
-                    <option value="seq_identity">Identity</option>
-                    <option value="seq_similarity">Similarity</option>
-                    <option value="seq_modifications">Modifications</option>
-                    <option value="seq_alignment">Alignment</option>
-                </select>
-            </div>
-
-            <button type="submit" class="btn btn-primary">Calculate</button>
-        </form>
-
-        <div id="result" class="mt-3"></div>
+        </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <!-- Your JavaScript here -->
 </body>
 </html>
