@@ -27,15 +27,23 @@
             const results = {};
 
             for (let calculation of calculations) {
-                const response = await fetch('/' + calculation, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ seq1_name: seq1_name, seq1: seq1, seq2_name: seq2_name, seq2: seq2 })
-                });
+                try {
+                    const response = await fetch('/' + calculation, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ seq1_name: seq1_name, seq1: seq1, seq2_name: seq2_name, seq2: seq2 })
+                    });
 
-                results[calculation] = await response.json();
+                    if (response.ok) {
+                        results[calculation] = await response.json();
+                    } else {
+                        results[calculation] = { 'N/A': 'Error occurred' };
+                    }
+                } catch (error) {
+                    results[calculation] = { 'N/A': 'Error occurred' };
+                }
             }
 
             // Display the results
@@ -47,6 +55,7 @@
                 Alignment:<br><pre>${results['seq_alignment'].alignment}</pre>
             `;
         }
+
 
     </script>
 </head>
