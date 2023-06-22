@@ -24,6 +24,8 @@
             const seq2 = document.getElementById('seq2').value;
 
             const calculations = ['seq_identity', 'seq_similarity', 'seq_modifications', 'seq_alignment'];
+            const results = {};
+
             for (let calculation of calculations) {
                 const response = await fetch('/' + calculation, {
                     method: 'POST',
@@ -33,27 +35,25 @@
                     body: JSON.stringify({ seq1_name: seq1_name, seq1: seq1, seq2_name: seq2_name, seq2: seq2 })
                 });
 
-                const result = await response.json();
-
-                // Display the result
-                const resultElement = document.getElementById(calculation);
-                if (calculation === 'seq_identity') {
-                    resultElement.innerText = 'Identity: ' + result['identity percentage'] + '%';
-                } else if (calculation === 'seq_similarity') {
-                    resultElement.innerText = 'Similarity Score: ' + result['similarity score'];
-                } else if (calculation === 'seq_modifications') {
-                    resultElement.innerText = 'Modifications: ' + result.modifications;
-                } else if (calculation === 'seq_alignment') {
-                    resultElement.innerHTML = '<pre>Alignment:\n' + result.alignment + '</pre>';
-                }
+                results[calculation] = await response.json();
             }
+
+            // Display the results
+            const resultElement = document.getElementById('result');
+            resultElement.innerHTML = `
+                Identity: ${results['seq_identity']['identity percentage']}%<br>
+                Similarity Score: ${results['seq_similarity']['similarity score']}<br>
+                Modifications: ${results['seq_modifications'].modifications}<br>
+                Alignment:<br><pre>${results['seq_alignment'].alignment}</pre>
+            `;
         }
+
     </script>
 </head>
 <body>
     <div class="container mx-auto px-4">
         <img src="{{ url_for('static', filename='SilicoLifeLogo_Green.png') }}" alt="Logo" class="img-fluid mb-3">
-        <h1 class="mb-3">Sequence Comparison App</h1>
+        <h1 class="text-3xl mb-3">Sequence Comparison App</h1>
 
         <div class="grid grid-cols-2 gap-4">
             <div>
@@ -64,7 +64,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="seq1">Sequence 1:</label>
+                        <label for="seq1" class="block text-lg font-bold mb-2">Sequence 1:</label>
                         <textarea name="seq1" id="seq1" rows="4" class="form-control"></textarea>
                     </div>
 
@@ -74,10 +74,12 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="seq2">Sequence 2:</label>
+                        <label for="seq2" class="block text-lg font-bold mb-2">Sequence 2:</label>
                         <textarea name="seq2" id="seq2" rows="4" class="form-control"></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary">Calculate</button>
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mx-auto">
+                        Calculate
+                      </button>
                 </form>
             </div>
             <div>
