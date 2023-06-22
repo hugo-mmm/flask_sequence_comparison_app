@@ -59,7 +59,7 @@ def seq_identity():
             pivot_seq2 += 4
 
         if len(aligned_seq1) == 0:
-            return jsonify({'identity percentage': 'N/A'}), 200
+            return jsonify({'identity percentage': 'N/A', 'error': 'No alignment found.'}), 200
 
         identity = sum(a == b for a, b in zip(aligned_seq1, aligned_seq2)) / len(aligned_seq1) * 100
         identity = round(identity, 2)
@@ -71,6 +71,8 @@ def seq_identity():
         return jsonify(response), 200
     except KeyError as e:
         return jsonify({'identity percentage': 'N/A', 'error': 'Invalid request data. Missing key: {}'.format(e)}), 400
+    except Exception as e:
+        return jsonify({'identity percentage': 'N/A', 'error': str(e)}), 500
 
 @app.route('/seq_similarity', methods=['POST'])
 def seq_similarity():
@@ -81,12 +83,6 @@ def seq_similarity():
 
         seq1_name, seq1 = parse_sequence_data(seq1_name_data)
         seq2_name, seq2 = parse_sequence_data(seq2_name_data)
-
-        # Check for non-nucleotide characters in sequences
-        if any(letter.lower() not in seq1.lower() for letter in seq1):
-            return jsonify({'error': f"Inserted Sequence for {seq1_name} is not a nucleotide sequence"}), 400
-        if any(letter.lower() not in seq2.lower() for letter in seq2):
-            return jsonify({'error': f"Inserted Sequence for {seq2_name} is not a nucleotide sequence"}), 400
 
         alignments = aligner.align(seq1, seq2)
         best_alignment = alignments[0]
@@ -123,9 +119,11 @@ def seq_similarity():
 
         return jsonify(response), 200
     except ValueError as e:
-        raise  # Re-raise the error if it's not the expected ValueError
+        return jsonify({'error': str(e)}), 400
     except KeyError as e:
         return jsonify({'error': 'Invalid request data. Missing key: {}'.format(e)}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/seq_modifications', methods=['POST'])
 def seq_modifications():
@@ -149,6 +147,8 @@ def seq_modifications():
         return jsonify(response), 200
     except KeyError as e:
         return jsonify({'modifications': 'N/A', 'error': 'Invalid request data. Missing key: {}'.format(e)}), 400
+    except Exception as e:
+        return jsonify({'modifications': 'N/A', 'error': str(e)}), 500
 
 @app.route('/seq_alignment', methods=['POST'])
 def seq_alignment():
@@ -159,12 +159,6 @@ def seq_alignment():
 
         seq1_name, seq1 = parse_sequence_data(seq1_name_data)
         seq2_name, seq2 = parse_sequence_data(seq2_name_data)
-
-        # Check for non-nucleotide characters in sequences
-        if any(letter.lower() not in seq1.lower() for letter in seq1):
-            return jsonify({'error': f"Inserted Sequence for {seq1_name} is not a nucleotide sequence"}), 400
-        if any(letter.lower() not in seq2.lower() for letter in seq2):
-            return jsonify({'error': f"Inserted Sequence for {seq2_name} is not a nucleotide sequence"}), 400
 
         alignments = aligner.align(seq1, seq2)
         best_alignment = alignments[0]
@@ -177,9 +171,11 @@ def seq_alignment():
 
         return jsonify(response), 200
     except ValueError as e:
-        raise  # Re-raise the error if it's not the expected ValueError
+        return jsonify({'error': str(e)}), 400
     except KeyError as e:
         return jsonify({'error': 'Invalid request data. Missing key: {}'.format(e)}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.getenv('PORT', 80)))
