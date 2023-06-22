@@ -47,7 +47,7 @@
             }
 
             // Display the results
-            document.getElementById('seq_identity').innerHTML = `Identity: ${results['seq_identity']['identity percentage']}%`;
+            document.getElementById('seq_identity').innerHTML = `Identity: ${results['seq_identity']['identity percentage']}`;
             document.getElementById('seq_similarity').innerHTML = `Similarity Score: ${results['seq_similarity']['similarity score']}`;
             document.getElementById('seq_modifications').innerHTML = `Modifications: ${results['seq_modifications'].modifications}`;
             document.getElementById('seq_alignment').innerHTML = `Alignment:<br><pre>${results['seq_alignment'].alignment}</pre>`;
