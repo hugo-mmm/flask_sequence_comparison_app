@@ -28,6 +28,8 @@ def seq_identity():
         
         seq1_name, seq1 = parse_sequence_data(seq1_name_data)
         seq2_name, seq2 = parse_sequence_data(seq2_name_data)
+
+        blosum62 = substitution_matrices.load("BLOSUM62")
         
         aligner = PairwiseAligner()
         aligner.substitution_matrix = blosum62
