@@ -27,32 +27,38 @@
             const results = {};
 
             for (let calculation of calculations) {
-                try {
-                    const response = await fetch('/' + calculation, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({ seq1_name: seq1_name, seq1: seq1, seq2_name: seq2_name, seq2: seq2 })
-                    });
+                const response = await fetch('/' + calculation, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ seq1_name: seq1_name, seq1: seq1, seq2_name: seq2_name, seq2: seq2 })
+                });
 
-                    if (response.ok) {
-                        results[calculation] = await response.json();
-                    } else {
-                        results[calculation] = { 'N/A': 'Error occurred' };
-                    }
-                } catch (error) {
-                    results[calculation] = { 'N/A': 'Error occurred' };
+                if (response.status === 200) {
+                    results[calculation] = await response.json();
+                } else {
+                    const error = await response.json();
+                    results[calculation] = { error: error.error };
                 }
             }
 
             // Display the results
-            document.getElementById('seq_identity').innerHTML = `Identity: ${results['seq_identity']['identity percentage']}%`;
-            document.getElementById('seq_similarity').innerHTML = `Similarity Score: ${results['seq_similarity']['similarity score']}`;
-            document.getElementById('seq_modifications').innerHTML = `Modifications: ${results['seq_modifications'].modifications}`;
-            document.getElementById('seq_alignment').innerHTML = `Alignment:<br><pre>${results['seq_alignment'].alignment}</pre>`;
-        }
+            document.getElementById('seq_identity').textContent = results['seq_identity']['identity percentage'] || 'N/A';
+            document.getElementById('seq_similarity').textContent = results['seq_similarity']['similarity score'] || 'N/A';
+            document.getElementById('seq_modifications').textContent = results['seq_modifications'].modifications || 'N/A';
+            document.getElementById('seq_alignment').textContent = results['seq_alignment'].alignment || 'N/A';
 
+            // Display the errors
+            const errorElement = document.getElementById('errors');
+            const errors = Object.values(results).map(result => result.error).filter(error => error);
+            if (errors.length > 0) {
+                const errorList = errors.map(error => `<li>${error}</li>`).join('');
+                errorElement.innerHTML = `<ul>${errorList}</ul>`;
+            } else {
+                errorElement.innerHTML = '';
+            }
+        }
     </script>
 </head>
 <body>
@@ -92,6 +98,7 @@
                 <div id="seq_similarity" class="mt-3 seq_similarity"></div>
                 <div id="seq_modifications" class="mt-3 seq_modifications"></div>
                 <div id="seq_alignment" class="mt-3 seq_alignment"></div>
+                <div id="errors" class="mt-3 text-red-500"></div>
             </div>
         </div>
     </div>
