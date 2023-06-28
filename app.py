@@ -125,7 +125,7 @@ def seq_similarity():
 
         if len(aligned_seq1) > 0:
             similarity = (sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq1, aligned_seq2)) /  min_aligned_seq) /  min_similarity * 100
-            similarity = round(similarity, 2)
+            similarity = round(similarity/similarity, 2)
         else:
             similarity = 0
 
