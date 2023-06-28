@@ -110,38 +110,27 @@ def seq_similarity():
 
 
         if len(aligned_seq1) > 0:
-            similarity_seq1 = sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq1, aligned_seq1)) / len(aligned_seq1)
+            similarity_seq1 = sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq1, aligned_seq1))
         else:
             similarity_seq1 = 0
 
         if len(aligned_seq2) > 0:
-            similarity_seq2 = sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq2, aligned_seq2)) / len(aligned_seq2)
+            similarity_seq2 = sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq2, aligned_seq2))
         else:
             similarity_seq2 = 0
 
         min_similarity = min(similarity_seq1, similarity_seq2)
-        min_aligned_seq = min(len(aligned_seq1), len(aligned_seq2))
 
 
         if len(aligned_seq1) > 0:
-            similarity = (sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq1, aligned_seq2)) /  min_aligned_seq) /  min_similarity * 100
+            similarity = sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq1, aligned_seq2)) /  min_similarity * 100
             similarity = round(similarity, 2)
         else:
             similarity = 0
 
         
-
-
-        print(f"Similarity seq1: {similarity_seq1}")
-        print(f"Similarity seq2: {similarity_seq2}")
-        print(f"Final similarity: {similarity}")
-        print(f"min_aligned_seq: {min_aligned_seq}")
-        print(f"min_similarity: {min_similarity}")
-        
-        
-        
         response = {
-            'similarity score': similarity
+            'similarity score': '{:.2f}%'.format(similarity)  # Add the percentage symbol
         }
 
         return jsonify(response), 200
