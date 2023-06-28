@@ -129,9 +129,17 @@ def seq_similarity():
         else:
             similarity = 0
 
+        
 
-        similarity = "X"
 
+        print(f"Similarity seq1: {similarity_seq1}")
+        print(f"Similarity seq2: {similarity_seq2}")
+        print(f"Final similarity: {similarity}")
+        print(f"min_aligned_seq: {min_aligned_seq}")
+        print(f"min_similarity: {min_similarity}")
+        
+        
+        
         response = {
             'similarity score': similarity
         }
