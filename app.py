@@ -14,8 +14,8 @@ aligner.open_gap_score = -5
 aligner.extend_gap_score = -1
 
 def parse_sequence_data(data):
-    name = data[:data.index('\n')].strip()[1:]
-    sequence = data[data.index('\n')+1:].replace(' ', '').replace('\n', '')
+    name = data[:data.index(char(10))].strip()[1:]
+    sequence = data[data.index(char(10))+1:].replace(char(10), ' ').replace(' ', '')
     return name, sequence
 
 
@@ -106,7 +106,7 @@ def seq_similarity():
             pivot_seq2 += 4
 
 
-
+        # Calculate percent similarity
         if len(aligned_seq1) > 0:
             similarity_seq1 = sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq1, aligned_seq1))
         else:
@@ -121,7 +121,7 @@ def seq_similarity():
 
 
         if len(aligned_seq1) > 0:
-            similarity = sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq1, aligned_seq2)) / min_similarity * 100
+            similarity = sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq1, aligned_seq2)) / min_similarity
             similarity = round(similarity, 2)
         else:
             similarity = 0
