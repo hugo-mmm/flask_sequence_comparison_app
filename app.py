@@ -130,7 +130,7 @@ def seq_similarity():
             similarity = 0
 
         response = {
-            'similarity score': similarity
+            'similarity score': "similarity"
         }
 
         return jsonify(response), 200
