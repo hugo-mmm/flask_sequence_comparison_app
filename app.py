@@ -14,10 +14,12 @@ aligner.open_gap_score = -5
 aligner.extend_gap_score = -1
 
 def parse_sequence_data(data):
-    name = data[:data.index(char(10))].strip()[1:]
-    sequence = data[data.index(char(10))+1:].replace(char(10), ' ').replace(' ', '')
+    lines = data.strip().split('\n')
+    name_line = next(line for line in lines if line.startswith(">"))
+    name = name_line[1:].strip()
+    sequence = ''.join(''.join(line.split()[1:]) for line in lines[1:])
+    sequence += lines[-1]
     return name, sequence
-
 
 @app.route('/')
 def index():
@@ -106,22 +108,23 @@ def seq_similarity():
             pivot_seq2 += 4
 
 
-        # Calculate percent similarity
+
         if len(aligned_seq1) > 0:
-            similarity_seq1 = sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq1, aligned_seq1))
+            similarity_seq1 = sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq1, aligned_seq1)) / len(aligned_seq1)
         else:
             similarity_seq1 = 0
 
         if len(aligned_seq2) > 0:
-            similarity_seq2 = sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq2, aligned_seq2))
+            similarity_seq2 = sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq2, aligned_seq2)) / len(aligned_seq2)
         else:
             similarity_seq2 = 0
 
         min_similarity = min(similarity_seq1, similarity_seq2)
+        min_aligned_seq = min(len(aligned_seq1), len(aligned_seq2))
 
 
         if len(aligned_seq1) > 0:
-            similarity = sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq1, aligned_seq2)) / min_similarity
+            similarity = sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq1, aligned_seq2)) /  min_aligned_seq * 100
             similarity = round(similarity, 2)
         else:
             similarity = 0
