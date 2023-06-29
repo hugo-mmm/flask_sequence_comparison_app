@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request, render_template
 from Bio.Align import PairwiseAligner
 from Bio.Seq import Seq
-from Bio.Align.substitution_matrices import MatrixInfo
+from Bio.SubsMat.MatrixInfo import blosum62 as blosum
 import sys
 import os
 
@@ -9,8 +9,7 @@ app = Flask(__name__)
 
 # Initialize aligner globally
 aligner = PairwiseAligner()
-blosum62 = substitution_matrices.load("BLOSUM62")
-aligner.substitution_matrix = blosum62
+aligner.substitution_matrix = blosum
 aligner.open_gap_score = -5
 aligner.extend_gap_score = -1
 
@@ -21,7 +20,6 @@ def parse_sequence_data(data):
     sequence = ''.join(''.join(line.split()[1:]) for line in lines[1:])
     sequence += lines[-1]
     return name, sequence
-
 
 @app.route('/')
 def index():
@@ -114,7 +112,7 @@ def seq_similarity():
         aligner = PairwiseAligner()
 
         # Set the substitution matrix
-        aligner.substitution_matrix = BLOSUM62
+        aligner.substitution_matrix = blosum
         
         # Set the gap penalty score
         aligner.open_gap_score = -10 # Open gap penalty
