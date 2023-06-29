@@ -188,17 +188,8 @@ def seq_alignment():
 
         alignment_str = str(best_alignment)
 
-        aligned_seq1 = best_alignment.aligned[0]
-        aligned_seq2 = best_alignment.aligned[1]
-        alignment_length_seq1 = len(aligned_seq1)
-        alignment_length_seq2 = len(aligned_seq2)
-
         response = {
-            'alignment': alignment_str,
-            'aligned_seq1': aligned_seq1,
-            'aligned_seq2': aligned_seq2,
-            'alignment_length_seq1': alignment_length_seq1,
-            'alignment_length_seq2': alignment_length_seq2
+            'alignment': alignment_str
         }
 
         return jsonify(response), 200
@@ -208,7 +199,6 @@ def seq_alignment():
         return jsonify({'error': 'Invalid request data. Missing key: {}'.format(e)}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.getenv('PORT', 80)))
