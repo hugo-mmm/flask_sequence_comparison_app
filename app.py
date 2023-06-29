@@ -1,8 +1,7 @@
 from flask import Flask, jsonify, request, render_template
 from Bio.Align import PairwiseAligner
-from Bio.Align import substitution_matrices
-from Bio import pairwise2
-from Bio.SubsMat import MatrixInfo
+from Bio.Seq import Seq
+from Bio.Align.substitution_matrices import MatrixInfo
 import sys
 import os
 
@@ -111,28 +110,21 @@ def seq_similarity():
             pivot_seq2 += 4
 
 
-
         # Define an aligner
         aligner = PairwiseAligner()
 
+        # Set the substitution matrix
+        aligner.substitution_matrix = BLOSUM62
+        
         # Set the gap penalty score
         aligner.open_gap_score = -10 # Open gap penalty
         aligner.extend_gap_score = -0.5 # Gap extension penalty
 
-        # Set the mode to global
-        aligner.mode = 'global'
+        # Perform alignment and get the best score
+        alignment_score = aligner.align(aligned_seq1, aligned_seq2).score
 
-        # Create an alignment
-        alignments = aligner.align(aligned_seq1, aligned_seq2)
-
-        # Get the top alignment's score
-        alignment_score = alignments[0].score
-
-        # Get the smaller length of the two sequences
-        min_len = min(len(aligned_seq1), len(aligned_seq2))
-
-        # Calculate the similarity percentage
-        similarity_percentage = (alignment_score / min_len) * 100
+        # Compute similarity
+        similarity_percentage = (alignment_score / min(len(aligned_seq1), len(aligned_seq2))) * 100
         similarity = round(similarity_percentage, 2)
 
         
