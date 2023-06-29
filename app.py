@@ -1,6 +1,8 @@
 from flask import Flask, jsonify, request, render_template
 from Bio.Align import PairwiseAligner
 from Bio.Align import substitution_matrices
+from Bio import pairwise2
+from Bio.SubsMat import MatrixInfo
 import sys
 import os
 
@@ -110,25 +112,18 @@ def seq_similarity():
 
 
 
-        if len(aligned_seq1) > 0:
-            similarity_seq1 = sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq1, aligned_seq1))
-        else:
-            similarity_seq1 = 0
+        # Perform pairwise sequence alignment
+        alignments = pairwise2.align.globalds(aligned_seq1, aligned_seq2, blosum62, -10, -0.5)
 
-        if len(aligned_seq2) > 0:
-            similarity_seq2 = sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq2, aligned_seq2))
-        else:
-            similarity_seq2 = 0
+        # Get the alignment score
+        alignment_score = alignments[0][2]
 
-        min_similarity = min(similarity_seq1, similarity_seq2)
+        # Get the smaller length of the two sequences
+        min_len = min(len(aligned_seq1), len(aligned_seq2))
 
-
-        if len(aligned_seq1) > 0:
-            similarity = sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq1, aligned_seq2)) /  min_similarity * 100
-            similarity = max(similarity, 0)  # Set similarity to 0 if it's negative
-            similarity = round(similarity, 2)
-        else:
-            similarity = 0
+        # Calculate the similarity percentage
+        similarity_percentage = (alignment_score / min_len) * 100
+        similarity = round(similarity_percentage, 2)
 
         
         response = {
