@@ -112,11 +112,21 @@ def seq_similarity():
 
 
 
-        # Perform pairwise sequence alignment
-        alignments = pairwise2.align.globalds(aligned_seq1, aligned_seq2, blosum62, -10, -0.5)
+        # Define an aligner
+        aligner = PairwiseAligner()
 
-        # Get the alignment score
-        alignment_score = alignments[0][2]
+        # Set the gap penalty score
+        aligner.open_gap_score = -10 # Open gap penalty
+        aligner.extend_gap_score = -0.5 # Gap extension penalty
+
+        # Set the mode to global
+        aligner.mode = 'global'
+
+        # Create an alignment
+        alignments = aligner.align(aligned_seq1, aligned_seq2)
+
+        # Get the top alignment's score
+        alignment_score = alignments[0].score
 
         # Get the smaller length of the two sequences
         min_len = min(len(aligned_seq1), len(aligned_seq2))
