@@ -127,15 +127,14 @@ def seq_similarity():
         min_similarity = min(similarity_seq1, similarity_seq2)
 
         if len(aligned_seq1) > 0:
-            similarity = (sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq1, aligned_seq2))) #/  min_similarity * 100
-            #similarity = round(similarity, 2)
+            similarity = (sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq1, aligned_seq2))) / min_similarity * 100
+            similarity = round(similarity, 2)
+            similarity = max(similarity, 0)  # Set similarity to 0 if it's negative
         else:
             similarity = 0
 
         response = {
             'similarity_score': similarity,
-            'length_aligned_seq1': alignment_length_seq1,
-            'length_aligned_seq2': alignment_length_seq2,
             'minimum_similarity': min_similarity
         }
 
@@ -146,6 +145,7 @@ def seq_similarity():
         return jsonify({'error': 'Invalid request data. Missing key: {}'.format(e)}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 
 @app.route('/seq_modifications', methods=['POST'])
