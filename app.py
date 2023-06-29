@@ -128,15 +128,15 @@ def seq_similarity():
 
         if len(aligned_seq1) > 0:
             similarity = (sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq1, aligned_seq2))) / min_similarity * 100
-            similarity = round(similarity, 2)
             similarity = max(similarity, 0)  # Set similarity to 0 if it's negative
+            similarity = round(similarity, 2)
         else:
             similarity = 0
 
         response = {
-            'similarity_score': similarity,
-            'minimum_similarity': min_similarity
+            'similarity_score': '{:.2f}%'.format(similarity)  # Add the percentage symbol
         }
+
 
         return jsonify(response), 200
     except ValueError as e:
