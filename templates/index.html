@@ -48,18 +48,18 @@
 
             // Display the results
             document.getElementById('seq_identity').innerHTML = `Identity: ${results['seq_identity']['identity percentage']}`;
-            document.getElementById('seq_similarity').innerHTML = `Similarity Score: ${results['seq_similarity']['similarity score']}`;
+            document.getElementById('seq_similarity').innerHTML = `Similarity Score: ${results['seq_similarity']['similarity_score']}`;
             document.getElementById('seq_modifications').innerHTML = `Modifications: ${results['seq_modifications'].modifications}`;
             document.getElementById('seq_alignment').innerHTML = `Alignment:<br><pre>${results['seq_alignment'].alignment}</pre>`;
 
             // Display the additional variables
             document.getElementById('aligned_seq1').innerHTML = `Aligned Sequence 1: ${results['seq_alignment'].aligned_seq1}`;
             document.getElementById('aligned_seq2').innerHTML = `Aligned Sequence 2: ${results['seq_alignment'].aligned_seq2}`;
-            document.getElementById('len_aligned_seq1').innerHTML = `Length of Aligned Sequence 1: ${results['seq_alignment'].len_aligned_seq1}`;
-            document.getElementById('len_aligned_seq2').innerHTML = `Length of Aligned Sequence 2: ${results['seq_alignment'].len_aligned_seq2}`;
+            document.getElementById('len_aligned_seq1').innerHTML = `Length of Aligned Sequence 1: ${results['seq_alignment'].length_aligned_seq1}`;
+            document.getElementById('len_aligned_seq2').innerHTML = `Length of Aligned Sequence 2: ${results['seq_alignment'].length_aligned_seq2}`;
             document.getElementById('similarity_seq1').innerHTML = `Similarity of Aligned Sequence 1: ${results['seq_similarity'].similarity_seq1}`;
             document.getElementById('similarity_seq2').innerHTML = `Similarity of Aligned Sequence 2: ${results['seq_similarity'].similarity_seq2}`;
-            document.getElementById('min_similarity').innerHTML = `Minimum Similarity: ${results['seq_similarity'].min_similarity}`;
+            document.getElementById('min_similarity').innerHTML = `Minimum Similarity: ${results['seq_similarity'].minimum_similarity}`;
 
             // Display the errors
             const errorElement = document.getElementById('errors');

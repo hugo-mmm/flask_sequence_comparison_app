@@ -59,10 +59,13 @@ def seq_identity():
             pivot_seq1 += 4
             pivot_seq2 += 4
 
-        if len(aligned_seq1) == 0:
+        len_aligned_seq1 = len(aligned_seq1)
+        len_aligned_seq2 = len(aligned_seq2)
+
+        if len_aligned_seq1 == 0:
             return jsonify({'identity percentage': 'N/A', 'error': 'No alignment found.'}), 200
 
-        identity = sum(a == b for a, b in zip(aligned_seq1, aligned_seq2)) / len(aligned_seq1) * 100
+        identity = sum(a == b for a, b in zip(aligned_seq1, aligned_seq2)) / len_aligned_seq1 * 100
         identity = round(identity, 2)
 
         response = {
@@ -108,7 +111,8 @@ def seq_similarity():
             pivot_seq1 += 4
             pivot_seq2 += 4
 
-
+        alignment_length_seq1 = len(aligned_seq1)
+        alignment_length_seq2 = len(aligned_seq2)
 
         if len(aligned_seq1) > 0:
             similarity_seq1 = sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq1, aligned_seq1))
@@ -122,16 +126,17 @@ def seq_similarity():
 
         min_similarity = min(similarity_seq1, similarity_seq2)
 
-
         if len(aligned_seq1) > 0:
-            similarity = (sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq1, aligned_seq2))) /  min_similarity * 100
-            similarity = round(similarity, 2)
+            similarity = (sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq1, aligned_seq2))) #/  min_similarity * 100
+            #similarity = round(similarity, 2)
         else:
             similarity = 0
 
-        
         response = {
-            'similarity score': '{:.2f}%'.format(similarity)  # Add the percentage symbol
+            'similarity_score': similarity,
+            'length_aligned_seq1': alignment_length_seq1,
+            'length_aligned_seq2': alignment_length_seq2,
+            'minimum_similarity': min_similarity
         }
 
         return jsonify(response), 200
@@ -141,6 +146,7 @@ def seq_similarity():
         return jsonify({'error': 'Invalid request data. Missing key: {}'.format(e)}), 400
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 @app.route('/seq_modifications', methods=['POST'])
 def seq_modifications():
@@ -166,7 +172,7 @@ def seq_modifications():
         return jsonify({'modifications': 'N/A', 'error': 'Invalid request data. Missing key: {}'.format(e)}), 400
     except Exception as e:
         return jsonify({'modifications': 'N/A', 'error': str(e)}), 500
-
+    
 @app.route('/seq_alignment', methods=['POST'])
 def seq_alignment():
     data = request.get_json()
@@ -196,3 +202,5 @@ def seq_alignment():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.getenv('PORT', 80)))
+
+
