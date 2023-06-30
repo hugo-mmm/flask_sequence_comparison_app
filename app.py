@@ -2,9 +2,6 @@ from flask import Flask, jsonify, request, render_template
 from Bio.Align import PairwiseAligner
 from Bio.Align import substitution_matrices
 from Bio import pairwise2
-from Bio import pairwise2, Align
-from Bio.SubsMat import MatrixInfo as matlist
-from Bio.Seq import Seq
 import sys
 import os
 
@@ -82,7 +79,6 @@ def seq_identity():
 @app.route('/seq_similarity', methods=['POST'])
 def seq_similarity():
     data = request.get_json()
-    
     try:
         seq1_name_data = ">" + data['seq1_name'] + "\n" + data['seq1']
         seq2_name_data = ">" + data['seq2_name'] + "\n" + data['seq2']
@@ -90,26 +86,56 @@ def seq_similarity():
         seq1_name, seq1 = parse_sequence_data(seq1_name_data)
         seq2_name, seq2 = parse_sequence_data(seq2_name_data)
 
-        # Using the Gonnet Matrix
-        matrix = matlist.gonnet
-        gap_open = -10
-        gap_extend = -0.5
-
-        alignments = pairwise2.align.globalds(Seq(seq1), Seq(seq2), matrix, gap_open, gap_extend)
-
+        alignments = aligner.align(seq1, seq2)
         best_alignment = alignments[0]
-        aligned_seq1, aligned_seq2, score, begin, end = best_alignment
+        split_seq = str(best_alignment).split("\n")
+
+        aligned_seq1 = ""
+        aligned_seq2 = ""
+        pivot_seq1 = 0
+        pivot_seq2 = 2
+
+        num_rows = int(len(split_seq) / 4)
+
+        for i in range(num_rows):
+            seq1_to_add = split_seq[pivot_seq1]
+            seq2_to_add = split_seq[pivot_seq2]
+
+            max_index = len(seq1_to_add) - 4 if i == num_rows - 1 else len(seq1_to_add)
+
+            aligned_seq1 += seq1_to_add[20:max_index]
+            aligned_seq2 += seq2_to_add[20:max_index]
+
+            pivot_seq1 += 4
+            pivot_seq2 += 4
+
+
+
+        if len(aligned_seq1) > 0:
+            similarity_seq1 = sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq1, aligned_seq1))
+        else:
+            similarity_seq1 = 0
+
+        if len(aligned_seq2) > 0:
+            similarity_seq2 = sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq2, aligned_seq2))
+        else:
+            similarity_seq2 = 0
+
+        min_similarity = min(similarity_seq1, similarity_seq2)
+
+
+        if len(aligned_seq1) > 0:
+            similarity = sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq1, aligned_seq2)) /  min_similarity * 100
+            similarity = round(similarity, 2)
+        else:
+            similarity = 0
 
         
-        # Calculate similarity as a percentage
-        similarity = (score / min(len(seq1), len(seq2))) * 100
-
         response = {
-            'similarity': '{:.2f}%'.format(similarity)  # Add the percentage symbol
+            'similarity score': '{:.2f}%'.format(similarity)  # Add the percentage symbol
         }
 
         return jsonify(response), 200
-        
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
     except KeyError as e:
