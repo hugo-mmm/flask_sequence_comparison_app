@@ -1,7 +1,10 @@
 from flask import Flask, jsonify, request, render_template
 from Bio.Align import PairwiseAligner
+from Bio.Align import substitution_matrices
+from Bio import pairwise2
+from Bio import pairwise2, Align
+from Bio.SubsMat import MatrixInfo as matlist
 from Bio.Seq import Seq
-from Bio.SubsMat.MatrixInfo import blosum62 as blosum
 import sys
 import os
 
@@ -9,7 +12,8 @@ app = Flask(__name__)
 
 # Initialize aligner globally
 aligner = PairwiseAligner()
-aligner.substitution_matrix = blosum
+blosum62 = substitution_matrices.load("BLOSUM62")
+aligner.substitution_matrix = blosum62
 aligner.open_gap_score = -5
 aligner.extend_gap_score = -1
 
@@ -20,6 +24,7 @@ def parse_sequence_data(data):
     sequence = ''.join(''.join(line.split()[1:]) for line in lines[1:])
     sequence += lines[-1]
     return name, sequence
+
 
 @app.route('/')
 def index():
@@ -77,6 +82,7 @@ def seq_identity():
 @app.route('/seq_similarity', methods=['POST'])
 def seq_similarity():
     data = request.get_json()
+    
     try:
         seq1_name_data = ">" + data['seq1_name'] + "\n" + data['seq1']
         seq2_name_data = ">" + data['seq2_name'] + "\n" + data['seq2']
@@ -84,53 +90,26 @@ def seq_similarity():
         seq1_name, seq1 = parse_sequence_data(seq1_name_data)
         seq2_name, seq2 = parse_sequence_data(seq2_name_data)
 
-        alignments = aligner.align(seq1, seq2)
+        # Using the Gonnet Matrix
+        matrix = matlist.gonnet
+        gap_open = -10
+        gap_extend = -0.5
+
+        alignments = pairwise2.align.globalds(Seq(seq1), Seq(seq2), matrix, gap_open, gap_extend)
+
         best_alignment = alignments[0]
-        split_seq = str(best_alignment).split("\n")
-
-        aligned_seq1 = ""
-        aligned_seq2 = ""
-        pivot_seq1 = 0
-        pivot_seq2 = 2
-
-        num_rows = int(len(split_seq) / 4)
-
-        for i in range(num_rows):
-            seq1_to_add = split_seq[pivot_seq1]
-            seq2_to_add = split_seq[pivot_seq2]
-
-            max_index = len(seq1_to_add) - 4 if i == num_rows - 1 else len(seq1_to_add)
-
-            aligned_seq1 += seq1_to_add[20:max_index]
-            aligned_seq2 += seq2_to_add[20:max_index]
-
-            pivot_seq1 += 4
-            pivot_seq2 += 4
-
-
-        # Define an aligner
-        aligner = PairwiseAligner()
-
-        # Set the substitution matrix
-        aligner.substitution_matrix = blosum
-        
-        # Set the gap penalty score
-        aligner.open_gap_score = -10 # Open gap penalty
-        aligner.extend_gap_score = -0.5 # Gap extension penalty
-
-        # Perform alignment and get the best score
-        alignment_score = aligner.align(aligned_seq1, aligned_seq2).score
-
-        # Compute similarity
-        similarity_percentage = (alignment_score / min(len(aligned_seq1), len(aligned_seq2))) * 100
-        similarity = round(similarity_percentage, 2)
+        aligned_seq1, aligned_seq2, score, begin, end = best_alignment
 
         
+        # Calculate similarity as a percentage
+        similarity = (score / min(len(seq1), len(seq2))) * 100
+
         response = {
-            'similarity score': '{:.2f}%'.format(similarity)  # Add the percentage symbol
+            'similarity': '{:.2f}%'.format(similarity)  # Add the percentage symbol
         }
 
         return jsonify(response), 200
+        
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
     except KeyError as e:
