@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request, render_template
 from Bio.Align import PairwiseAligner
-from Bio.Seq import Seq
-from Bio.SubsMat.MatrixInfo import blosum62 as blosum
+from Bio.Align import substitution_matrices
+from Bio import pairwise2
 import sys
 import os
 
@@ -9,7 +9,8 @@ app = Flask(__name__)
 
 # Initialize aligner globally
 aligner = PairwiseAligner()
-aligner.substitution_matrix = blosum
+blosum62 = substitution_matrices.load("BLOSUM62")
+aligner.substitution_matrix = blosum62
 aligner.open_gap_score = -5
 aligner.extend_gap_score = -1
 
@@ -20,6 +21,7 @@ def parse_sequence_data(data):
     sequence = ''.join(''.join(line.split()[1:]) for line in lines[1:])
     sequence += lines[-1]
     return name, sequence
+
 
 @app.route('/')
 def index():
@@ -108,22 +110,25 @@ def seq_similarity():
             pivot_seq2 += 4
 
 
-        # Define an aligner
-        aligner = PairwiseAligner()
 
-        # Set the substitution matrix
-        aligner.substitution_matrix = blosum
-        
-        # Set the gap penalty score
-        aligner.open_gap_score = -10 # Open gap penalty
-        aligner.extend_gap_score = -0.5 # Gap extension penalty
+        if len(aligned_seq1) > 0:
+            similarity_seq1 = sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq1, aligned_seq1))
+        else:
+            similarity_seq1 = 0
 
-        # Perform alignment and get the best score
-        alignment_score = aligner.align(aligned_seq1, aligned_seq2).score
+        if len(aligned_seq2) > 0:
+            similarity_seq2 = sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq2, aligned_seq2))
+        else:
+            similarity_seq2 = 0
 
-        # Compute similarity
-        similarity_percentage = (alignment_score / min(len(aligned_seq1), len(aligned_seq2))) * 100
-        similarity = round(similarity_percentage, 2)
+        min_similarity = min(similarity_seq1, similarity_seq2)
+
+
+        if len(aligned_seq1) > 0:
+            similarity = sum(blosum62.get((a, b), -4) for a, b in zip(aligned_seq1, aligned_seq2)) /  min_similarity * 100
+            similarity = round(similarity, 2)
+        else:
+            similarity = 0
 
         
         response = {
