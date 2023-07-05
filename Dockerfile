@@ -1,20 +1,22 @@
-# Use an official Python runtime as a parent image
-FROM python:3.10
+# For more information, please refer to https://aka.ms/vscode-docker-python
+FROM python:3.10-slim
 
-# Set the working directory in the container to /app
-WORKDIR /app
-
-# Add the current directory contents into the container at /app
-ADD . /app
-
-# Set up a virtual environment
-RUN python -m venv venv
-
-# Upgrade pip and install any needed packages specified in requirements.txt
-RUN /bin/bash -c "source venv/bin/activate && pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt"
-
-# Make port 80 available to the world outside this container
+# Warning: A port below 1024 has been exposed. This requires the image to run as a root user which is not a best practice.
+# For more information, please refer to https://aka.ms/vscode-docker-python-user-rights`
 EXPOSE 80
 
-# Run app.py when the container launches
-CMD [ "venv/bin/python", "app.py" ]
+# Keeps Python from generating .pyc files in the container
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Turns off buffering for easier container logging
+ENV PYTHONUNBUFFERED=1
+
+# Install pip requirements
+COPY requirements.txt .
+RUN python -m pip install -r requirements.txt
+
+WORKDIR /app
+COPY . /app
+
+# During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
+CMD ["gunicorn", "--bind", "0.0.0.0:80", "app:app"]
