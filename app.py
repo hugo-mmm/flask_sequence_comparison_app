@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, request, render_template
 from Bio.Align import PairwiseAligner
 from Bio.Align import substitution_matrices
-from Bio import pairwise2
+from Bio import Align
 import sys
 import os
 import local_align as la
@@ -32,8 +32,8 @@ def index():
 def maia_align():
     data = request.get_json()
     try:
-        seq1_name_data = ">" + data['seq1_name'] + "\n" + data['seq1']
-        seq2_name_data = ">" + data['seq2_name'] + "\n" + data['seq2']
+        #seq1_name_data = ">" + data['seq1_name'] + "\n" + data['seq1']
+        #seq2_name_data = ">" + data['seq2_name'] + "\n" + data['seq2']
 
         seq1_name, seq1 = parse_sequence_data(seq1_name_data)
         seq2_name, seq2 = parse_sequence_data(seq2_name_data)
