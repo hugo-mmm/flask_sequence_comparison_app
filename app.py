@@ -15,6 +15,9 @@ aligner.substitution_matrix = blosum62
 aligner.open_gap_score = -5
 aligner.extend_gap_score = -1
 
+seq1_name = "Sequence 1"
+seq2_name = "Sequence 2"
+
 def parse_sequence_data(data):
     lines = data.strip().split('\n')
     name_line = next(line for line in lines if line.startswith(">"))
@@ -32,8 +35,8 @@ def index():
 def maia_align():
     data = request.get_json()
     try:
-        #seq1_name_data = ">" + data['seq1_name'] + "\n" + data['seq1']
-        #seq2_name_data = ">" + data['seq2_name'] + "\n" + data['seq2']
+        seq1_name_data = ">" + data['seq1_name'] + "\n" + data['seq1']
+        seq2_name_data = ">" + data['seq2_name'] + "\n" + data['seq2']
 
         seq1_name, seq1 = parse_sequence_data(seq1_name_data)
         seq2_name, seq2 = parse_sequence_data(seq2_name_data)
