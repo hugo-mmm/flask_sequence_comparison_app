@@ -46,9 +46,19 @@
                 }
             }
 
+                        
+            // Display ALL the results
+            const resultElement = document.getElementById('results');
+            resultElement.innerHTML = ''; // Clear previous content
+            for (let key in results) {
+            if (results.hasOwnProperty(key)) {
+                let value = results[key];
+                resultElement.innerHTML += `<p>${key}: ${JSON.stringify(value)}</p>`;
+            }
+            
             // Display the results
-            document.getElementById('percentage_identities').innerHTML = `Identity: ${results['percentage_identities'].percentage_identities}`;
-            document.getElementById('percent_positives').innerHTML = `Similarity Percentage: ${results['percent_positives'].percent_positives}`;
+            document.getElementById('percentage_identities').innerHTML = `Identity: ${results['seq_identity']['identity percentage']}`;
+            document.getElementById('seq_similarity').innerHTML = `Similarity Percentage: ${results['seq_similarity']['similarity score']}`;
             document.getElementById('substitutions').innerHTML = `Substitutions: ${results['substitutions'].substitutions}`;
             document.getElementById('alignment').innerHTML = `Alignment:<br><pre>${results['alignment'].alignments}</pre>`;
 
