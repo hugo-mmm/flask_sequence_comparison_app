@@ -51,9 +51,10 @@
             const resultElement = document.getElementById('results');
             resultElement.innerHTML = ''; // Clear previous content
             for (let key in results) {
-            if (results.hasOwnProperty(key)) {
-                let value = results[key];
-                resultElement.innerHTML += `<p>${key}: ${JSON.stringify(value)}</p>`;
+                if (results.hasOwnProperty(key)) {
+                    let value = results[key];
+                    resultElement.innerHTML += `<p>${key}: ${JSON.stringify(value)}</p>`;
+                }
             }
             
             // Display the results
