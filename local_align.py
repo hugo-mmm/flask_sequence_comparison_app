@@ -4,9 +4,11 @@ from Bio.Align import PairwiseAligner
 from Bio.Seq import Seq
 from Bio.Blast import NCBIWWW
 from Bio.Blast import NCBIXML
+from Bio.Align import MultipleSeqAlignment
 
 import sys
 import os
+
 
 # Initialize aligner globally
 
@@ -25,27 +27,31 @@ def parse_sequence_data(data):
     sequence += lines[-1]
     return name, sequence
 
+
 def print_similarity_matrix():
     print(str(blosum))    
     
 def seq_similarity(seq1: str, seq2: str):
-    
     # compute alignment
     alignments = aligner.align(seq1, seq2)
     
+    # select the best alignment
+    best_alignment = alignments[0]
+    
     # compute aligned sequences
-    aligned_seq1, aligned_seq2 = get_aligned_seqs(alignments[0])
+    aligned_seq1, aligned_seq2 = get_aligned_seqs(best_alignment)
 
     # compute positive matches (accounting for amino acid substitutions)
-    positives, len_alignment, percent_positives = compute_positives(aligned_seq1,aligned_seq2)
+    positives, len_alignment, percent_positives = compute_positives(aligned_seq1, aligned_seq2)
 
     # compute amino acid substitutions
-    substitutions = compute_substitutions(aligned_seq1,aligned_seq2)
+    substitutions = compute_substitutions(aligned_seq1, aligned_seq2)
 
     # compute identities
-    identity, percent_ident = calc_identity(aligned_seq1,aligned_seq2)
+    identity, percent_ident = calc_identity(aligned_seq1, aligned_seq2)
+    
+    return positives, percent_positives, identity, percent_ident, substitutions, len_alignment, best_alignment
 
-    return positives, percent_positives, identity, percent_ident, substitutions, len_alignment, alignments
 
 def compute_substitutions(seq1:str, seq2:str):
     substitutions = []

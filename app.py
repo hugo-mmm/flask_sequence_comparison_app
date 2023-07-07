@@ -1,19 +1,11 @@
 from flask import Flask, jsonify, request, render_template
 from Bio.Align import PairwiseAligner
 from Bio.Align import substitution_matrices
-from Bio import Align
 import sys
 import os
 import local_align as la
 
 app = Flask(__name__)
-
-# Initialize aligner globally
-aligner = PairwiseAligner()
-blosum62 = substitution_matrices.load("BLOSUM62")
-aligner.substitution_matrix = blosum62
-aligner.open_gap_score = -5
-aligner.extend_gap_score = -1
 
 seq1_name = "Sequence 1"
 seq2_name = "Sequence 2"
@@ -31,9 +23,12 @@ def parse_sequence_data(data):
 def index():
     return render_template('index.html')
 
-@app.route('/maia_align', methods=['POST'])
-def maia_align():
+@app.route('/align', methods=['POST'])
+def align():
     data = request.get_json()
+    #log_filename = 'error.log'
+    #logging.basicConfig(filename=log_filename, level=logging.ERROR, format='%(asctime)s %(levelname)s: %(message)s')
+
     try:
         seq1_name_data = ">" + data['seq1_name'] + "\n" + data['seq1']
         seq2_name_data = ">" + data['seq2_name'] + "\n" + data['seq2']
@@ -41,24 +36,25 @@ def maia_align():
         seq1_name, seq1 = parse_sequence_data(seq1_name_data)
         seq2_name, seq2 = parse_sequence_data(seq2_name_data)
 
-        positives, percent_positives, identities, percent_identities, substitutions, len_alignment, alignments = la.seq_similarity(seq1, seq2)
+        positives, percent_positives, identities, percent_identities, substitutions, len_alignment, alignment = la.seq_similarity(seq1, seq2)
 
         response = {
-            'positives': positives,
-            'percent_positives': '{:.2f}%'.format(percent_positives),
-            'identities': identities,
-            'percentage_identities': '{:.2f}%'.format(percent_identities),
-            'substitutions': substitutions,
-            'length_alignment': len_alignment,
-            'alignment': alignments[0]
+            'percentage_identities': '{:.2f}%'.format(percent_identities),                
+            'seq_similarity': '{:.2f}%'.format(percent_positives),                
+            'substitutions': substitutions,            
+            'alignment': str(alignment)
         }
 
         return jsonify(response), 200
 
     except KeyError as e:
-        return jsonify({'identity percentage': 'N/A', 'error': 'Invalid request data. Missing key: {}'.format(e)}), 400
+        return jsonify({'error': 'Invalid request data. Missing key: {}'.format(e)}), 400
     except Exception as e:
-        return jsonify({'identity percentage': 'N/A', 'error': str(e)}), 500
+        #logging.exception(e)
+        return jsonify({'error': 'An error occurred during sequence comparison.'}), 500
+
+
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.getenv('PORT', 80)))
+    app.run(host='0.0.0.0', port=int(os.getenv('PORT', 80)), debug=True)
+

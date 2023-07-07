@@ -23,43 +23,44 @@
             const seq2_name = document.getElementById('seq2_name').value;
             const seq2 = document.getElementById('seq2').value;        
 
-            //const calculations = ['percent_ident', 'percent_positives', 'substitutions', 'alignments'];
-            results = {};
-            try {
-                const response = await fetch('/align', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ seq1_name: seq1_name, seq1: seq1, seq2_name: seq2_name, seq2: seq2 })
-                });
+            const calculations = ['percent_ident', 'percent_positives', 'substitutions', 'alignments'];
+            const results = {};
+            for (let calculation of calculations) {
+                try {
+                    const response = await fetch('/maia_align', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ seq1_name: seq1_name, seq1: seq1, seq2_name: seq2_name, seq2: seq2 })
+                    });
 
-                if (response.ok) {
-                    results = await response.json();
-                    //console.log(results)
-                } else {
-                    results = { 'N/A': 'Error occurred' };
+                    if (response.ok) {
+                        results[calculation] = await response.json();
+                    } else {
+                        results[calculation] = { 'N/A': 'Error occurred2' };
+                    }
+                } catch (error) {
+                    console.error(error); // Log the error to the console
+                    results[calculation] = { 'N/A': 'Error occurred3' };
                 }
-            } catch (error) {
-                //console.error(error); // Log the error to the console
-                results = { 'N/A': 'Error occurred' };
-            }            
+            }
 
             // Display the percentage_identities
             const percentageIdentitiesElement = document.getElementById('percent_ident');
-            percentageIdentitiesElement.innerHTML = `Identity: ${results.percentage_identities}`;
+            percentageIdentitiesElement.innerHTML = `Identity: ${results['percent_ident']['percent_ident']}`;
 
             // Display the seq_similarity
             const seqSimilarityElement = document.getElementById('percent_positives');
-            seqSimilarityElement.innerHTML = `Similarity Percentage: ${results.seq_similarity}`;
+            seqSimilarityElement.innerHTML = `Similarity Percentage: ${results['percent_positives']['percent_positives']}`;
 
             // Display the substitutions
             const substitutionsElement = document.getElementById('substitutions');
-            substitutionsElement.innerHTML = `Substitutions: ${results.substitutions}`;
+            substitutionsElement.innerHTML = `Substitutions: ${results['substitutions']['substitutions']}`;
 
             // Display the alignment
             const alignmentElement = document.getElementById('alignments');
-            alignmentElement.innerHTML = `Alignment:<br><pre>${results.alignment}</pre>`;
+            alignmentElement.innerHTML = `Alignment:<br><pre>${results['alignments']['alignments']}</pre>`;
 
             // Display the errors
             const errorElement = document.getElementById('errors');
