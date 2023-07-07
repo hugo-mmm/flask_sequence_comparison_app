@@ -23,7 +23,6 @@
             const seq2_name = document.getElementById('seq2_name').value;
             const seq2 = document.getElementById('seq2').value;        
 
-            //const calculations = ['percent_ident', 'percent_positives', 'substitutions', 'alignments'];
             results = {};
             try {
                 const response = await fetch('/align', {
@@ -46,12 +45,12 @@
             }            
 
             // Display the percentage_identities
-            const percentageIdentitiesElement = document.getElementById('percent_ident');
-            percentageIdentitiesElement.innerHTML = `Identity: ${results.percentage_identities}`;
+            const percentageIdentitiesElement = document.getElementById('percentage_identities');
+            percentageIdentitiesElement.innerHTML = `Identity: ${results.percentage_identities} (${results.identities}/${results.len_alignment})`;
 
             // Display the seq_similarity
-            const seqSimilarityElement = document.getElementById('percent_positives');
-            seqSimilarityElement.innerHTML = `Similarity Percentage: ${results.seq_similarity}`;
+            const percentPositivesElement = document.getElementById('percent_positives');
+            percentPositivesElement.innerHTML = `Positives: ${results.percent_positives} (${results.positives}/${results.len_alignment})`;
 
             // Display the substitutions
             const substitutionsElement = document.getElementById('substitutions');
@@ -106,7 +105,7 @@
                 </form>
             </div>
             <div>
-                <div id="percent_ident" class="mt-3"></div>
+                <div id="percentage_identities" class="mt-3"></div>
                 <div id="percent_positives" class="mt-3"></div>
                 <div id="substitutions" class="mt-3"></div>
                 <div id="alignments" class="mt-3"></div>

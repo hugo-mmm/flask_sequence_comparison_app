@@ -39,9 +39,12 @@ def align():
         positives, percent_positives, identities, percent_identities, substitutions, len_alignment, alignment = la.seq_similarity(seq1, seq2)
 
         response = {
-            'percentage_identities': '{:.2f}%'.format(percent_identities),                
-            'seq_similarity': '{:.2f}%'.format(percent_positives),                
-            'substitutions': substitutions,            
+            'positives': positives,
+            'percent_positives': '{:.2f}%'.format(percent_positives),
+            'identities': identities,
+            'percentage_identities': '{:.2f}%'.format(percent_identities),            
+            'substitutions': substitutions,
+            'len_alignment': len_alignment,
             'alignment': str(alignment)
         }
 

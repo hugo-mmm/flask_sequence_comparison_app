@@ -56,7 +56,7 @@ def seq_similarity(seq1: str, seq2: str):
 def compute_substitutions(seq1:str, seq2:str):
     substitutions = []
     for i, (a, b) in enumerate(zip(seq1, seq2), start=1):
-        if a != b:
+        if a != b and a!='-' and b!='-':
             substitutions.append(f"{a}{i}{b}")
     
     return ' '.join(substitutions) if substitutions else 'NONE'
