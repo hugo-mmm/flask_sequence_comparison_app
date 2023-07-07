@@ -42,7 +42,7 @@ def align():
             'positives': positives,
             'percent_positives': '{:.2f}%'.format(percent_positives),
             'identities': identities,
-            'percentage_identities': '{:.2f}%'.format(percent_identities),            
+            'percentage_identities': '{:.2f}%'.format(percent_identities),
             'substitutions': substitutions,
             'len_alignment': len_alignment,
             'alignment': str(alignment)
